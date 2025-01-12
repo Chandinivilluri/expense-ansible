@@ -14,5 +14,13 @@
       enabled: yes
 
 
- # - name: connect to mysql server
+  - name: connect to mysql server
+    community.mysql.mysql_info:
+      login_user: root
+      login_password: ExpenseApp@1
+      login_host: mysql.chandiniinfo.xyz
+    register: mysql_info
 
+  - name: print the output
+    ansible.builtin.debug:
+      msg:"MYSQL_info: {{mysql_info}}"
