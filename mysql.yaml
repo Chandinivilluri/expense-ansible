@@ -6,3 +6,13 @@
     ansible.builtin.dnf:
       name: mysql-server
       state: installed
+
+  - name: start and enable MYSQL server
+    ansible.builtin.service:
+      name: mysql-service
+      state: started
+      enabled: yes
+
+
+ # - name: connect to mysql server
+
