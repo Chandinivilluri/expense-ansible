@@ -8,10 +8,13 @@
   - name: enable nodejs 20
     ansible.builtin.command: dnf module enable nodejs:20 -y
 
-  - name: install nodejs
+  - name: install nodejs and mysql
     ansible.builtin.package:
-      name: nodejs
+      name: "{{item}}"
       state: present
+    - loop:
+        nodejs
+        mysql
 
   - name: create expense user
     ansible.builtin.user:
@@ -36,3 +39,32 @@
   - name: Install dependencies
     community.general.npm:
       path: /app
+
+  - name: copy backend code
+    ansible.builtin.copy:
+      src: backend.service
+      dest: /etc/systemd/system/backend.service
+
+  - name: install python libs
+    ansible.builtin.pip:
+      name: "{{item}}"
+      executable: pip3.9
+    loop:
+    - cryptography
+    - PyMySQL
+
+  - name: import mysql data
+    community.mysql.mysql_db:
+      state: import
+      name: ALL
+      login_user: root
+      login_password: ExpenseApp@1
+      login_host: mysql.chandiniinfo.xyz
+      target: /app/schema/backend.sql
+
+  - name: daemon reload and restart service
+    ansible.builtin.systemd_service:
+      enabled: yes
+      state: restarted
+      daemon_reload: true
+      name: backend
